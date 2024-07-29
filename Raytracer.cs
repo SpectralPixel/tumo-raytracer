@@ -1,5 +1,7 @@
 namespace raytracer
 {
+    using System;
+
     class RayTracer
     {
         Surface surface;
@@ -25,16 +27,22 @@ namespace raytracer
                     int centerX = surface.width / 2;
                     int centerY = surface.height / 2;
 
-                    int distX = System.Math.Abs(x - centerX);
-                    int distY = System.Math.Abs(y - centerY);
-                    float distFromCenter = System.MathF.Sqrt(System.MathF.Pow(distX, 2) + System.MathF.Pow(distY, 2)); // pythagoras
+                    int distX = Math.Abs(x - centerX);
+                    int distY = Math.Abs(y - centerY);
+                    float distFromCenter = MathF.Sqrt(MathF.Pow(distX, 2) + MathF.Pow(distY, 2)); // pythagoras
 
                     float avgScreenSize = (surface.width + surface.height) / 2f;
                     float circleSize = avgScreenSize / 5f;
 
-                    if (distFromCenter < circleSize) {
+                    if (distFromCenter < circleSize)
+                    {
                         color.r = gradientX;
                         color.g = gradientY;
+                    }
+                    else
+                    {
+                        color.b = gradientX;
+                        color.r = gradientY;
                     }
 
                     surface.SetPixel(x, y, color.r, color.g, color.b);
