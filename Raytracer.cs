@@ -20,7 +20,7 @@ namespace raytracer
             {
                 for (int y = 0; y < surface.height; y++)
                 {
-                    Color color = new Color(0f, 0f, 0f);
+                    Vector3 color = new Vector3(0f, 0f, 0f);
 
                     int centerX = surface.width / 2;
                     int centerY = surface.height / 2;
@@ -28,35 +28,28 @@ namespace raytracer
                     float avgScreenSize = (surface.width + surface.height) / 2f;
                     float circleSize = avgScreenSize / 5f;
 
-                    Circle circle1 = new Circle(centerX, centerY, 200, false);
-                    Circle circle2 = new Circle(500, 700, 200, true);
+                    Circle circle1 = new Circle(
+                        centerX,
+                        centerY,
+                        200,
+                        new Vector3(1f, 0f, 0f),
+                        false
+                    );
+                    Circle circle2 = new Circle(
+                        250,
+                        400,
+                        150,
+                        new Vector3(0f, 1f, 0f),
+                        true
+                    );
 
                     float gradientX = x / (float)surface.width;
                     float gradientY = y / (float)surface.height;
 
-                    color.r = circle1.GetCircleLuminanceAt(x, y) + circle2.GetCircleLuminanceAt(x, y);
+                    color += circle1.GetCircleColorAt(x, y);
+                    color += circle2.GetCircleColorAt(x, y);
 
-                    // switch (whatToRun) {
-                    //     default: // 0
-                    //         if (distFromCenter < circleSize)
-                    //         {
-                    //             color.r = gradientX;
-                    //             color.g = gradientY;
-                    //         }
-                    //         else
-                    //         {
-                    //             color.b = gradientX;
-                    //             color.r = gradientY;
-                    //         }
-                    //         break;
-                    //     case 1:
-                    //         float gradientCircle = 1 - distFromCenter / circleSize;
-                    //         color.r = gradientX * gradientCircle;
-                    //         color.g = gradientY * gradientCircle;
-                    //         break;
-                    // }
-
-                    surface.SetPixel(x, y, color.r, color.g, color.b);
+                    surface.SetPixel(x, y, color.X, color.Y, color.Z);
                 }
             }
         }
@@ -66,14 +59,21 @@ namespace raytracer
         int centerX;
         int centerY;
         float radius;
+        Vector3 color;
         bool gradual;
 
-        public Circle(int x, int y, float radius, bool gradual)
+        public Circle(int x, int y, float radius, Vector3 color, bool gradual)
         {
             this.centerX = x;
             this.centerY = y;
             this.radius = radius;
+            this.color = color;
             this.gradual = gradual;
+        }
+
+        public Vector3 GetCircleColorAt(int x, int y)
+        {
+            return color * GetCircleLuminanceAt(x, y);
         }
 
         public float GetCircleLuminanceAt(int x, int y)
@@ -98,7 +98,6 @@ namespace raytracer
                     break;
             }
     
-
             return circleLuminance;
         }
 
@@ -112,19 +111,6 @@ namespace raytracer
                 distanceY * distanceY
             );
             return distanceFromCenter;
-        }
-    }
-
-    struct Color {
-        public float r { get; set; }
-        public float g { get; set; }
-        public float b { get; set; }
-
-        public Color(float r, float g, float b)
-        {
-            this.r = r;
-            this.g = g;
-            this.b = b;
         }
     }
 }
