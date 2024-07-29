@@ -8,8 +8,6 @@ namespace raytracer
         Surface surface;
         Game window;
 
-        float whatToRun = 1;
-
         public RayTracer(Surface surface, Game window)
         {
             this.surface = surface;
@@ -30,8 +28,8 @@ namespace raytracer
                     float avgScreenSize = (surface.width + surface.height) / 2f;
                     float circleSize = avgScreenSize / 5f;
 
-                    Circle circle1 = new Circle(centerX, centerY, 200);
-                    Circle circle2 = new Circle(500, 700, 200);
+                    Circle circle1 = new Circle(centerX, centerY, 200, false);
+                    Circle circle2 = new Circle(500, 700, 200, true);
 
                     float gradientX = x / (float)surface.width;
                     float gradientY = y / (float)surface.height;
@@ -68,25 +66,39 @@ namespace raytracer
         int centerX;
         int centerY;
         float radius;
+        bool gradual;
 
-        public Circle(int x, int y, float radius)
+        public Circle(int x, int y, float radius, bool gradual)
         {
             this.centerX = x;
             this.centerY = y;
             this.radius = radius;
+            this.gradual = gradual;
         }
 
         public float GetCircleLuminanceAt(int x, int y)
         {
-            // scale circle up by diving it by the circle radius
-            // "change from position space to color space"
-            // set an extreme to a gradient by normalizing it
-            float circleGradient = calculateDistanceFromCenter(x, y) / radius;
+            float distance = calculateDistanceFromCenter(x, y);
+            float circleLuminance;
 
-            // now invert the colors for a black background
-            // remember, the maximum luminance will always be 1
-            // this also has to be clamped to prevent one circle from interfering with other pixels by subtracting values that should be zero
-            float circleLuminance = Math.Clamp(1 - circleGradient, 0, 1);
+            switch (gradual) {
+                case false:
+                    // scale circle up by diving it by the circle radius
+                    // "change from position space to color space"
+                    // set an extreme to a gradient by normalizing it
+                    float circleGradient = distance / radius;
+
+                    // now invert the colors for a black background
+                    // remember, the maximum luminance will always be 1
+                    // this also has to be clamped to prevent one circle from interfering with other pixels by subtracting values that should be zero
+                    circleLuminance = Math.Clamp(1 - circleGradient, 0, 1);
+                    break;
+                case true:
+                    circleLuminance = distance < radius ? 1 : 0;
+                    break;
+            }
+    
+
             return circleLuminance;
         }
 
