@@ -23,50 +23,84 @@ namespace raytracer
                 {
                     Color color = new Color(0f, 0f, 0f);
 
-                    float gradientX = x / (float)surface.width;
-                    float gradientY = y / (float)surface.height;
-
                     int centerX = surface.width / 2;
                     int centerY = surface.height / 2;
-
-                    int distX = Math.Abs(x - centerX);
-                    int distY = Math.Abs(y - centerY);
-                    float distFromCenter = MathF.Sqrt(distX * distX + distY * distY); // pythagoras
 
                     float avgScreenSize = (surface.width + surface.height) / 2f;
                     float circleSize = avgScreenSize / 5f;
 
-                    switch (whatToRun) {
-                        default: // 0
-                            if (distFromCenter < circleSize)
-                            {
-                                color.r = gradientX;
-                                color.g = gradientY;
-                            }
-                            else
-                            {
-                                color.b = gradientX;
-                                color.r = gradientY;
-                            }
-                            break;
-                        case 1:
-                            float gradientCircle = 1 - distFromCenter / circleSize;
-                            color.r = gradientX * gradientCircle;
-                            color.g = gradientY * gradientCircle;
-                            break;
-                    }
+                    Circle circle1 = new Circle(centerX, centerY, 200);
+                    Circle circle2 = new Circle(500, 700, 200);
+
+                    float gradientX = x / (float)surface.width;
+                    float gradientY = y / (float)surface.height;
+
+                    color.r = circle1.GetCircleLuminanceAt(x, y) + circle2.GetCircleLuminanceAt(x, y);
+
+                    // switch (whatToRun) {
+                    //     default: // 0
+                    //         if (distFromCenter < circleSize)
+                    //         {
+                    //             color.r = gradientX;
+                    //             color.g = gradientY;
+                    //         }
+                    //         else
+                    //         {
+                    //             color.b = gradientX;
+                    //             color.r = gradientY;
+                    //         }
+                    //         break;
+                    //     case 1:
+                    //         float gradientCircle = 1 - distFromCenter / circleSize;
+                    //         color.r = gradientX * gradientCircle;
+                    //         color.g = gradientY * gradientCircle;
+                    //         break;
+                    // }
 
                     surface.SetPixel(x, y, color.r, color.g, color.b);
                 }
             }
         }
+    }
 
+    struct Circle {
+        int centerX;
+        int centerY;
+        float radius;
+
+        public Circle(int x, int y, float radius)
+        {
+            this.centerX = x;
+            this.centerY = y;
+            this.radius = radius;
+        }
+
+        public float GetCircleLuminanceAt(int x, int y)
+        {
+            int distanceX = x - centerX;
+            int distanceY = y - centerY;
+            float distanceFromCenter = MathF.Sqrt(
+                distanceX * distanceX +
+                distanceY * distanceY
+            ); // pythagoras
+
+            // scale circle up by diving it by the circle radius
+            // "change from position space to color space"
+            // set an extreme to a gradient by normalizing it
+            float circleGradient = distanceFromCenter / radius;
+
+            // now invert the colors for a black background
+            // remember, the maximum luminance will always be 1
+            float circleLuminance = 1 - circleGradient;
+            return circleLuminance;
+        }
     }
 
     struct Color {
         public float r { get; set; }
         public float g { get; set; }
         public float b { get; set; }
+
         public Color(float r, float g, float b)
         {
             this.r = r;
