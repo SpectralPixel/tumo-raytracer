@@ -1,12 +1,17 @@
 namespace raytracer
 {
     using System;
+    using System.Collections.Generic;
     using OpenTK.Mathematics;
 
     class RayTracer
     {
         Surface surface;
         Game window;
+
+        public static Vector2i MAX_SCREEN_DIMS = new Vector2i(1920, 1080);
+
+        Circles circles = new Circles();
 
         public RayTracer(Surface surface, Game window)
         {
@@ -21,37 +26,53 @@ namespace raytracer
                 for (int y = 0; y < surface.height; y++)
                 {
                     Vector3 color = new Vector3(0f, 0f, 0f);
-
-                    int centerX = surface.width / 2;
-                    int centerY = surface.height / 2;
-
-                    float avgScreenSize = (surface.width + surface.height) / 2f;
-                    float circleSize = avgScreenSize / 5f;
-
-                    Circle circle1 = new Circle(
-                        centerX,
-                        centerY,
-                        200,
-                        new Vector3(1f, 0f, 0f),
-                        false
-                    );
-                    Circle circle2 = new Circle(
-                        250,
-                        400,
-                        150,
-                        new Vector3(0f, 1f, 0f),
-                        true
-                    );
-
+                        
                     float gradientX = x / (float)surface.width;
                     float gradientY = y / (float)surface.height;
 
-                    color += circle1.GetCircleColorAt(x, y);
-                    color += circle2.GetCircleColorAt(x, y);
+                    color += circles.GetColorAtPos(x, y);
 
                     surface.SetPixel(x, y, color.X, color.Y, color.Z);
                 }
             }
+        }
+    }
+
+    struct Circles {
+        List<Circle> circles;
+
+        public Circles()
+        {
+            this.circles = new List<Circle>();
+
+            Random r = new Random();
+            for (int i = 0; i < r.Next(30, 70); i++)
+            {
+                int x = r.Next(RayTracer.MAX_SCREEN_DIMS.X);
+                int y = r.Next(RayTracer.MAX_SCREEN_DIMS.Y);
+                float size = (float)r.Next(50, 300);
+                bool gradual = r.Next(0, 2) == 0 ? false : true;
+
+                float maximumSolidity;
+                if (gradual) maximumSolidity = 1f;
+                else maximumSolidity = 0.6f;
+                Vector3 color = new Vector3(
+                    r.Next(1000) * maximumSolidity / 1000,
+                    r.Next(1000) * maximumSolidity / 1000,
+                    r.Next(1000) * maximumSolidity / 1000
+                );
+
+                circles.Add(new Circle(x, y, size, color, gradual));
+            }
+        }
+
+        public Vector3 GetColorAtPos(int x, int y)
+        {
+            Vector3 color = new Vector3();
+            foreach (Circle c in circles) {
+                color += c.GetCircleColorAt(x, y);
+            }
+            return color;
         }
     }
 
