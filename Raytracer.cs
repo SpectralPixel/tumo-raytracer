@@ -7,6 +7,8 @@ namespace raytracer
         Surface surface;
         Game window;
 
+        float whatToRun = 1;
+
         public RayTracer(Surface surface, Game window)
         {
             this.surface = surface;
@@ -29,20 +31,29 @@ namespace raytracer
 
                     int distX = Math.Abs(x - centerX);
                     int distY = Math.Abs(y - centerY);
-                    float distFromCenter = MathF.Sqrt(MathF.Pow(distX, 2) + MathF.Pow(distY, 2)); // pythagoras
+                    float distFromCenter = MathF.Sqrt(distX * distX + distY * distY); // pythagoras
 
                     float avgScreenSize = (surface.width + surface.height) / 2f;
                     float circleSize = avgScreenSize / 5f;
 
-                    if (distFromCenter < circleSize)
-                    {
-                        color.r = gradientX;
-                        color.g = gradientY;
-                    }
-                    else
-                    {
-                        color.b = gradientX;
-                        color.r = gradientY;
+                    switch (whatToRun) {
+                        default: // 0
+                            if (distFromCenter < circleSize)
+                            {
+                                color.r = gradientX;
+                                color.g = gradientY;
+                            }
+                            else
+                            {
+                                color.b = gradientX;
+                                color.r = gradientY;
+                            }
+                            break;
+                        case 1:
+                            float gradientCircle = 1 - distFromCenter / circleSize;
+                            color.r = gradientX * gradientCircle;
+                            color.g = gradientY * gradientCircle;
+                            break;
                     }
 
                     surface.SetPixel(x, y, color.r, color.g, color.b);
