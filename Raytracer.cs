@@ -1,6 +1,7 @@
 namespace raytracer
 {
     using System;
+    using OpenTK.Mathematics;
 
     class RayTracer
     {
@@ -77,22 +78,28 @@ namespace raytracer
 
         public float GetCircleLuminanceAt(int x, int y)
         {
-            int distanceX = x - centerX;
-            int distanceY = y - centerY;
-            float distanceFromCenter = MathF.Sqrt(
-                distanceX * distanceX +
-                distanceY * distanceY
-            ); // pythagoras
-
             // scale circle up by diving it by the circle radius
             // "change from position space to color space"
             // set an extreme to a gradient by normalizing it
-            float circleGradient = distanceFromCenter / radius;
+            float circleGradient = calculateDistanceFromCenter(x, y) / radius;
 
             // now invert the colors for a black background
             // remember, the maximum luminance will always be 1
-            float circleLuminance = 1 - circleGradient;
+            // this also has to be clamped to prevent one circle from interfering with other pixels by subtracting values that should be zero
+            float circleLuminance = Math.Clamp(1 - circleGradient, 0, 1);
             return circleLuminance;
+        }
+
+        private float calculateDistanceFromCenter(int otherX, int otherY)
+        {
+            int distanceX = otherX - centerX;
+            int distanceY = otherY - centerY;
+            // pythagoras
+            float distanceFromCenter = MathF.Sqrt(
+                distanceX * distanceX +
+                distanceY * distanceY
+            );
+            return distanceFromCenter;
         }
     }
 
