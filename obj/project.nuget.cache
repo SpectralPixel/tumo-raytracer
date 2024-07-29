@@ -1,0 +1,73 @@
+{
+  "version": 2,
+  "dgSpecHash": "V1BMsYx6P8Q=",
+  "success": true,
+  "projectFilePath": "/Users/un1ty.d3v/Documents/raytracer_template/raytracer.csproj",
+  "expectedPackageFiles": [
+    "/Users/un1ty.d3v/.nuget/packages/opentk/4.6.4/opentk.4.6.4.nupkg.sha512",
+    "/Users/un1ty.d3v/.nuget/packages/opentk.compute/4.6.4/opentk.compute.4.6.4.nupkg.sha512",
+    "/Users/un1ty.d3v/.nuget/packages/opentk.core/4.6.4/opentk.core.4.6.4.nupkg.sha512",
+    "/Users/un1ty.d3v/.nuget/packages/opentk.graphics/4.6.4/opentk.graphics.4.6.4.nupkg.sha512",
+    "/Users/un1ty.d3v/.nuget/packages/opentk.input/4.6.4/opentk.input.4.6.4.nupkg.sha512",
+    "/Users/un1ty.d3v/.nuget/packages/opentk.mathematics/4.6.4/opentk.mathematics.4.6.4.nupkg.sha512",
+    "/Users/un1ty.d3v/.nuget/packages/opentk.openal/4.6.4/opentk.openal.4.6.4.nupkg.sha512",
+    "/Users/un1ty.d3v/.nuget/packages/opentk.redist.glfw/3.3.0-pre20200830200122/opentk.redist.glfw.3.3.0-pre20200830200122.nupkg.sha512",
+    "/Users/un1ty.d3v/.nuget/packages/opentk.windowing.common/4.6.4/opentk.windowing.common.4.6.4.nupkg.sha512",
+    "/Users/un1ty.d3v/.nuget/packages/opentk.windowing.desktop/4.6.4/opentk.windowing.desktop.4.6.4.nupkg.sha512",
+    "/Users/un1ty.d3v/.nuget/packages/opentk.windowing.graphicslibraryframework/4.6.4/opentk.windowing.graphicslibraryframework.4.6.4.nupkg.sha512",
+    "/Users/un1ty.d3v/.nuget/packages/sixlabors.imagesharp/1.0.3/sixlabors.imagesharp.1.0.3.nupkg.sha512",
+    "/Users/un1ty.d3v/.nuget/packages/system.runtime.compilerservices.unsafe/5.0.0/system.runtime.compilerservices.unsafe.5.0.0.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Das Paket \"SixLabors.ImageSharp\" 1.0.3 weist eine bekannte moderat Schweregrad-Sicherheitsanfälligkeit auf, https://github.com/advisories/GHSA-5x7m-6737-26cr.",
+      "libraryId": "SixLabors.ImageSharp",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Das Paket \"SixLabors.ImageSharp\" 1.0.3 weist eine bekannte hoch Schweregrad-Sicherheitsanfälligkeit auf, https://github.com/advisories/GHSA-63p8-c4ww-9cg7.",
+      "libraryId": "SixLabors.ImageSharp",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Das Paket \"SixLabors.ImageSharp\" 1.0.3 weist eine bekannte hoch Schweregrad-Sicherheitsanfälligkeit auf, https://github.com/advisories/GHSA-65x7-c272-7g7r.",
+      "libraryId": "SixLabors.ImageSharp",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Das Paket \"SixLabors.ImageSharp\" 1.0.3 weist eine bekannte moderat Schweregrad-Sicherheitsanfälligkeit auf, https://github.com/advisories/GHSA-g85r-6x2q-45w7.",
+      "libraryId": "SixLabors.ImageSharp",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Das Paket \"SixLabors.ImageSharp\" 1.0.3 weist eine bekannte moderat Schweregrad-Sicherheitsanfälligkeit auf, https://github.com/advisories/GHSA-qxrv-gp6x-rc23.",
+      "libraryId": "SixLabors.ImageSharp",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
+}
