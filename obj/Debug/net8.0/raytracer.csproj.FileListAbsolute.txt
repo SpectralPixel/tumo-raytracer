@@ -28,3 +28,4 @@
 /Users/un1ty.d3v/Documents/raytracer_template/obj/Debug/net8.0/raytracer.pdb
 /Users/un1ty.d3v/Documents/raytracer_template/obj/Debug/net8.0/raytracer.genruntimeconfig.cache
 /Users/un1ty.d3v/Documents/raytracer_template/obj/Debug/net8.0/ref/raytracer.dll
+/Users/un1ty.d3v/Documents/raytracer_template/obj/Debug/net8.0/raytracer.sourcelink.json
