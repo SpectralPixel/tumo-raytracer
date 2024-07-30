@@ -6,40 +6,52 @@ namespace raytracer
 
     class RayTracer
     {
+        Surface oldSurface;
         Surface surface;
         Game window;
+        Camera cam;
 
         //Console.WriteLine("god i love how easy this function is to use");
 
-        Camera cam = new Camera(
-            new Vector2(160f, 90f),
-            70f,
-            new Vector3(0f, 1f, 0f),
-            new Vector3(0f, 0f, 0f)
-        );
+        float fov = 70f;
 
         public RayTracer(Surface surface, Game window)
         {
             this.surface = surface;
             this.window = window;
+
+            cam = new Camera(
+                new Vector3(0f, 1f, 0f),
+                new Vector3(0f, 0f, 0f),
+                Camera.ConvertScreenDims(surface.width, surface.height),
+                fov
+            );
         }
 
         public void Render()
         {
+            if (surface != oldSurface) cam.RecalculateScreenDimensions(Camera.ConvertScreenDims(surface.width, surface.height), fov);
+
             for (int x = 0; x < surface.width; x++)
             {
                 for (int y = 0; y < surface.height; y++)
                 {
-                    surface.SetPixel(x, y, 1f, 1f, 1f);
+                    Vector3 color = Vector3.Zero;
+
+                    //Ray cam.GetCameraRay()
+
+                    surface.SetPixel(x, y, color.X, color.Y, color.Z);
                 }
             }
+
+            oldSurface = surface;
         }
     }
 
     class Camera {
         static Vector3 UP_AXIS = Vector3.UnitY;
 
-        Vector2 targetResolution
+        Vector2 targetResolution;
         float aspectRatio;
 
         float fovDegrees;
@@ -63,11 +75,16 @@ namespace raytracer
         Vector3 up;
         Vector3 right;
 
-        public Camera(Vector2 targetResolution, float fov, Vector3 position, Vector3 rotation)
+        public Camera(Vector3 position, Vector3 rotation, Vector2 targetResolution, float fov)
         {
             this.position = position;
             this.forward = rotation;
-            
+
+            RecalculateScreenDimensions(targetResolution, fov);
+        }
+
+        public void RecalculateScreenDimensions(Vector2 targetResolution, float fov)
+        {
             this.targetResolution = targetResolution;
             this.aspectRatio = (float)(targetResolution.X / targetResolution.Y);
 
@@ -88,6 +105,14 @@ namespace raytracer
             brCorner = position + forward + -up * vpHalfHeight *  right * vpHalfHeight;
         }
 
+        public Ray GetCameraRay(Vector2i pos)
+        {
+            return GetCameraRay(new Vector2(
+                pos.X / targetResolution.X,
+                pos.Y / targetResolution.Y
+            ));
+        }
+
         public Ray GetCameraRay(Vector2 pos)
         {
             if (
@@ -101,15 +126,21 @@ namespace raytracer
 
             return new Ray(position, rayVector);
         }
+
+        public static Vector2 ConvertScreenDims(int width, int height)
+        {
+            return new Vector2(width, height);
+        }
     }
 
     class Ray {
-        Vector3 position;
-        Vector3 direction;
+        public Vector3 position;
+        public Vector3 direction;
 
-        public Ray(Vector3 pos, Vector3 dir) {
+        public Ray(Vector3 pos, Vector3 dir)
+        {
             this.position = pos;
-            this.direction = dir;
+            this.direction = dir - pos; // WARNING WARNING!!!!!!! ALREADY SUBTRACTING HERE!!!!!!!
         }
     }
 }
