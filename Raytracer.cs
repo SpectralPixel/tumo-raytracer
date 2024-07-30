@@ -39,7 +39,6 @@ namespace raytracer
     class Camera {
         static Vector3 UP_AXIS = Vector3.UnitY;
 
-
         float aspectRatio;
         float fovDegrees;
         float fovRadians;
@@ -69,7 +68,7 @@ namespace raytracer
             this.aspectRatio = (float)(targetResolution.X / targetResolution.Y);
 
             this.fovDegrees = fov;
-            fovRadians = fov * Math.PI / 180;
+            fovRadians = (float)(fov * Math.PI / 180);
 
             vpHalfHeight = (float)Math.Tan(fovRadians / 2);
             vpHeight = vpHalfHeight * 2;
