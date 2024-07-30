@@ -8,6 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = raytracer
-build_property.ProjectDir = /Users/un1ty.d3v/Documents/raytracer_template/
+build_property.ProjectDir = /Users/un1ty.d3v/Documents/tumo-raytracer/
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 

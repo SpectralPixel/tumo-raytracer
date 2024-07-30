@@ -440,11 +440,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/un1ty.d3v/Documents/raytracer_template/raytracer.csproj",
+      "projectUniqueName": "/Users/un1ty.d3v/Documents/tumo-raytracer/raytracer.csproj",
       "projectName": "raytracer",
-      "projectPath": "/Users/un1ty.d3v/Documents/raytracer_template/raytracer.csproj",
+      "projectPath": "/Users/un1ty.d3v/Documents/tumo-raytracer/raytracer.csproj",
       "packagesPath": "/Users/un1ty.d3v/.nuget/packages/",
-      "outputPath": "/Users/un1ty.d3v/Documents/raytracer_template/obj/",
+      "outputPath": "/Users/un1ty.d3v/Documents/tumo-raytracer/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/un1ty.d3v/.nuget/NuGet/NuGet.Config"
