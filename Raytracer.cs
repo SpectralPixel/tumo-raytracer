@@ -13,7 +13,7 @@ namespace raytracer
 
         //Console.WriteLine("god i love how easy this function is to use");
 
-        float fov = 70f;
+        float fov = 90f;
 
         public RayTracer(Surface surface, Game window)
         {
@@ -21,15 +21,15 @@ namespace raytracer
             this.window = window;
 
             cam = new Camera(
-                new Vector3(0f, 1f, 0f),
-                new Vector3(0f, 0f, 0f),
+                new Vector3(1f, 1f, 1f),
+                new Vector3(1f, 1f, 1f),
                 Camera.ConvertScreenDims(surface.width, surface.height),
                 fov
             );
         }
 
         public void Render()
-        {
+        {          
             if (surface != oldSurface) cam.RecalculateScreenDimensions(Camera.ConvertScreenDims(surface.width, surface.height), fov);
 
             for (int x = 0; x < surface.width; x++)
@@ -38,7 +38,9 @@ namespace raytracer
                 {
                     Vector3 color = Vector3.Zero;
 
-                    //Ray cam.GetCameraRay()
+                    Ray ray = cam.GetCameraRay(x, y);
+
+                    if (ray.direction.Y < 0) color.X = 1;
 
                     surface.SetPixel(x, y, color.X, color.Y, color.Z);
                 }
@@ -97,19 +99,21 @@ namespace raytracer
             vpHalfWidth = vpWidth / 2;
 
             right = Vector3.Cross(UP_AXIS, forward).Normalized();
-            up = Vector3.Cross(forward, forward).Normalized();
+            up = Vector3.Cross(forward, right).Normalized();
 
             tlCorner = position + forward +  up * vpHalfHeight * -right * vpHalfHeight;
             trCorner = position + forward +  up * vpHalfHeight *  right * vpHalfHeight;
             blCorner = position + forward + -up * vpHalfHeight * -right * vpHalfHeight;
             brCorner = position + forward + -up * vpHalfHeight *  right * vpHalfHeight;
+
+            Console.WriteLine($"{this.targetResolution} | {this.aspectRatio} | {this.fovDegrees} | {fovRadians} | {vpHalfHeight} | {vpHeight} | {vpWidth} | {vpHalfWidth} | {right} | {up} | {tlCorner} | {trCorner} | {blCorner} | {brCorner}");
         }
 
-        public Ray GetCameraRay(Vector2i pos)
+        public Ray GetCameraRay(int x, int y)
         {
             return GetCameraRay(new Vector2(
-                pos.X / targetResolution.X,
-                pos.Y / targetResolution.Y
+                x / targetResolution.X,
+                y / targetResolution.Y
             ));
         }
 
@@ -122,7 +126,7 @@ namespace raytracer
                 pos.Y >= 1
             ) throw new ArgumentException("Parameter must be between 0 and 1 (inclusive, exclusive)", nameof(pos));
 
-            Vector3 rayVector = tlCorner + right * pos.X * vpWidth - up * pos.X * vpHeight;
+            Vector3 rayVector = tlCorner + right * pos.X * vpWidth - up * pos.Y * vpHeight;
 
             return new Ray(position, rayVector);
         }
