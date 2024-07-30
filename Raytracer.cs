@@ -11,8 +11,6 @@ namespace raytracer
         Game window;
         Camera cam;
 
-        //Console.WriteLine("god i love how easy this function is to use");
-
         float fov = 90f;
 
         public RayTracer(Surface surface, Game window)
@@ -21,8 +19,8 @@ namespace raytracer
             this.window = window;
 
             cam = new Camera(
-                new Vector3(1f, 1f, 1f),
-                new Vector3(1f, 1f, 1f),
+                new Vector3(1f, 0f, 0f),
+                new Vector3(0f, 0f, 0f),
                 Camera.ConvertScreenDims(surface.width, surface.height),
                 fov
             );
@@ -97,16 +95,30 @@ namespace raytracer
             vpHeight = vpHalfHeight * 2;
             vpWidth = vpHeight * aspectRatio;
             vpHalfWidth = vpWidth / 2;
-
-            right = Vector3.Cross(UP_AXIS, forward).Normalized();
-            up = Vector3.Cross(forward, right).Normalized();
+            
+            right = CrossAndNormalize(UP_AXIS, forward);
+            up = CrossAndNormalize(forward, right);
 
             tlCorner = position + forward +  up * vpHalfHeight * -right * vpHalfHeight;
             trCorner = position + forward +  up * vpHalfHeight *  right * vpHalfHeight;
             blCorner = position + forward + -up * vpHalfHeight * -right * vpHalfHeight;
             brCorner = position + forward + -up * vpHalfHeight *  right * vpHalfHeight;
 
-            Console.WriteLine($"{this.targetResolution} | {this.aspectRatio} | {this.fovDegrees} | {fovRadians} | {vpHalfHeight} | {vpHeight} | {vpWidth} | {vpHalfWidth} | {right} | {up} | {tlCorner} | {trCorner} | {blCorner} | {brCorner}");
+            Console.WriteLine($"targetResolution: {this.targetResolution}");
+            Console.WriteLine($"aspectRatio: {this.aspectRatio}");
+            Console.WriteLine($"fovDegrees: {this.fovDegrees}");
+            Console.WriteLine($"fovRadians: {fovRadians}");
+            Console.WriteLine($"vpHalfHeight: {vpHalfHeight}");
+            Console.WriteLine($"vpHalfWidth: {vpHalfWidth}");
+            Console.WriteLine($"vpHeight: {vpHeight}");
+            Console.WriteLine($"vpWidth: {vpWidth}");
+            Console.WriteLine($"right: {right}");
+            Console.WriteLine($"up: {up}");
+            Console.WriteLine($"tlCorner: {tlCorner}");
+            Console.WriteLine($"trCorner: {trCorner}");
+            Console.WriteLine($"blCorner: {blCorner}");
+            Console.WriteLine($"brCorner: {brCorner}");
+            Console.WriteLine($"--------");
         }
 
         public Ray GetCameraRay(int x, int y)
@@ -135,6 +147,18 @@ namespace raytracer
         {
             return new Vector2(width, height);
         }
+
+        private Vector3 CrossAndNormalize(Vector3 vectorA, Vector3 vectorB)
+        {
+            // Vectors being either equal or set to zero will result in NaN!
+            // Therefore we slightly change the vectors if they would break the simulation.
+            float nudge = 0.1f;
+            Vector3 nudgeVector = new Vector3(nudge, nudge, nudge);
+            if (vectorA == Vector3.Zero) vectorA += nudgeVector;
+            if (vectorB == Vector3.Zero) vectorB += nudgeVector;
+            if (vectorA == vectorB)      vectorB += nudgeVector;
+            return Vector3.Cross(vectorA, vectorB).Normalized();
+        }
     }
 
     class Ray {
@@ -144,7 +168,8 @@ namespace raytracer
         public Ray(Vector3 pos, Vector3 dir)
         {
             this.position = pos;
-            this.direction = dir - pos; // WARNING WARNING!!!!!!! ALREADY SUBTRACTING HERE!!!!!!!
+            //this.direction = dir - pos; // WARNING WARNING!!!!!!! ALREADY SUBTRACTING HERE!!!!!!!
+            this.direction = dir;
         }
     }
 }
