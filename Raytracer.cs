@@ -83,5 +83,29 @@ namespace raytracer
             blCorner = position + forward + -up * vpHalfHeight * -right * vpHalfHeight;
             brCorner = position + forward + -up * vpHalfHeight *  right * vpHalfHeight;
         }
+
+        public Ray GetCameraRay(Vector2 pos)
+        {
+            if (
+                pos.X < 0 ||
+                pos.X >= 1 ||
+                pos.Y < 0 ||
+                pos.Y >= 1
+            ) throw new ArgumentException("Parameter must be between 0 and 1 (inclusive, exclusive)", nameof(pos));
+
+            Vector3 rayVector = tlCorner + right * pos.X * vpWidth - up * pos.X * vpHeight;
+
+            return new Ray(position, rayVector);
+        }
+    }
+
+    class Ray {
+        Vector3 position;
+        Vector3 direction;
+
+        public Ray(Vector3 pos, Vector3 dir) {
+            this.position = pos;
+            this.direction = dir;
+        }
     }
 }
