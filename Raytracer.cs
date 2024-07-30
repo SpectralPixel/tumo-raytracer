@@ -39,11 +39,14 @@ namespace raytracer
     class Camera {
         static Vector3 UP_AXIS = Vector3.UnitY;
 
+        Vector2 targetResolution
         float aspectRatio;
+
         float fovDegrees;
         float fovRadians;
+
         Vector3 position;
-        Vector3 forward; // forward vector
+        Vector3 forward;
 
         // VP = view plane
         float vpHalfWidth;
@@ -60,11 +63,12 @@ namespace raytracer
         Vector3 up;
         Vector3 right;
 
-        public Camera(Vector2d targetResolution, float fov, Vector3 position, Vector3 rotation)
+        public Camera(Vector2 targetResolution, float fov, Vector3 position, Vector3 rotation)
         {
             this.position = position;
             this.forward = rotation;
             
+            this.targetResolution = targetResolution;
             this.aspectRatio = (float)(targetResolution.X / targetResolution.Y);
 
             this.fovDegrees = fov;
