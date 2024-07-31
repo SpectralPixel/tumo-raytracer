@@ -135,7 +135,7 @@ namespace raytracer
         protected override void OnResize(ResizeEventArgs e)
         {
             surface.Resize(e.Width, e.Height);
-            rayTracer.cam.RecalculateScreenDimensions(Camera.ConvertScreenDims(e.Width, e.Height));
+            rayTracer.cam.RecalculateScreenDimensions(new Vector2i(e.Width, e.Height));
             Console.WriteLine("Resized {0}, {1}", e.Width, e.Height);
             GL.Viewport(0, 0, e.Width, e.Height);
             base.OnResize(e);

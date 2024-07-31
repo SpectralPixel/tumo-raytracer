@@ -16,14 +16,16 @@ namespace raytracer
             this.window = window;
 
             cam = new Camera(
+                new Vector3(0f, 3f, 0f),
                 new Vector3(1f, 0f, 0f),
-                new Vector3(1f, 0f, 0f),
-                Camera.ConvertScreenDims(surface.width, surface.height)
+                new Vector2i(surface.width, surface.height)
             );
         }
 
         public void Render()
-        {       
+        {      
+            cam.MoveBy(new Vector3(0.1f, 0f, 0f));
+
             for (int x = 0; x < surface.width; x++)
             {
                 for (int y = 0; y < surface.height; y++)
@@ -32,7 +34,15 @@ namespace raytracer
 
                     Ray ray = cam.GetCameraRay(x, y);
 
-                    if (ray.direction.Y > 0) color.X = 1;
+                    if (ray.direction.Y < 0)
+                    {
+                        float distanceToFloor = ray.position.Y / -ray.direction.Y;
+                        Vector3 intersectionPoint = ray.position + distanceToFloor * ray.direction;
+
+                        color.Y += (MathF.Sin(intersectionPoint.X) + 1f) / 2f;
+                        color.Z += (MathF.Sin(intersectionPoint.Z) + 1f) / 2f;
+                    }
+                    else color.X = 1;
 
                     surface.SetPixel(x, y, color);
                 }
@@ -46,7 +56,7 @@ namespace raytracer
         const float FOV_DEGREES = 90f;
         const float FOV_RADIANS = (float)(FOV_DEGREES * Math.PI / 180f);
 
-        Vector2 targetResolution;
+        Vector2i targetResolution;
         float aspectRatio;
 
         float fovDegrees;
@@ -70,28 +80,26 @@ namespace raytracer
         Vector3 up;
         Vector3 right;
 
-        public Camera(Vector3 position, Vector3 rotation, Vector2 targetResolution)
+        public Camera(Vector3 pos, Vector3 rotation, Vector2i targetResolution)
         {
-            this.position = position;
-            this.forward = rotation;
+            position = pos;
+            forward = rotation;
 
             RecalculateScreenDimensions(targetResolution);
         }
 
-        public void SetCameraTransform(Vector3 position, Vector3 rotation)
+        public void SetCameraTransform(Vector3 pos, Vector3 rotation)
         {
-            this.position = position;
-            this.forward = rotation;
-
-            Console.WriteLine($"Position: {position} | Rotation: {rotation}");
+            position = pos;
+            forward = rotation;
 
             CalculateVectors();
         }
 
-        public void RecalculateScreenDimensions(Vector2 targetResolution)
+        public void RecalculateScreenDimensions(Vector2i targetRes)
         {
-            this.targetResolution = targetResolution;
-            this.aspectRatio = (float)(targetResolution.X / targetResolution.Y);
+            targetResolution = ConvertScreenDims(targetRes);
+            aspectRatio = (float)(targetResolution.X / targetResolution.Y);
 
             vpHalfHeight = (float)Math.Tan(FOV_RADIANS / 2);
             vpHeight = vpHalfHeight * 2;
@@ -99,30 +107,12 @@ namespace raytracer
             vpHalfWidth = vpWidth / 2;
             
             CalculateVectors();
-
-            Console.WriteLine($"targetResolution: {this.targetResolution}");
-            Console.WriteLine($"aspectRatio: {this.aspectRatio}");
-            Console.WriteLine($"fovDegrees: {FOV_DEGREES}");
-            Console.WriteLine($"fovRadians: {FOV_RADIANS}");
-            Console.WriteLine($"vpHalfHeight: {vpHalfHeight}");
-            Console.WriteLine($"vpHalfWidth: {vpHalfWidth}");
-            Console.WriteLine($"vpHeight: {vpHeight}");
-            Console.WriteLine($"vpWidth: {vpWidth}");
-            Console.WriteLine($"right: {right}");
-            Console.WriteLine($"up: {up}");
-            Console.WriteLine($"tlCorner: {tlCorner}");
-            Console.WriteLine($"trCorner: {trCorner}");
-            Console.WriteLine($"blCorner: {blCorner}");
-            Console.WriteLine($"brCorner: {brCorner}");
-            Console.WriteLine($"--------");
         }
 
         public void CalculateVectors()
         {
             right = CrossAndNormalize(UP_AXIS, forward);
             up = CrossAndNormalize(forward, right);
-
-            Console.WriteLine($"right: {right} | up: {up} | tlCorner {tlCorner}");
 
             tlCorner = position + forward +  up * vpHalfHeight + -right * vpHalfWidth;
             trCorner = position + forward +  up * vpHalfHeight +  right * vpHalfWidth;
@@ -140,21 +130,20 @@ namespace raytracer
 
         public Ray GetCameraRay(Vector2 pos)
         {
-            if (
-                pos.X < 0 ||
-                pos.X >= 1 ||
-                pos.Y < 0 ||
-                pos.Y >= 1
-            ) throw new ArgumentException("Parameter must be between 0 and 1 (inclusive, exclusive)", nameof(pos));
+            if (pos.X < 0 || pos.X >= 1 || pos.Y < 0 || pos.Y >= 1)
+            {
+                Console.WriteLine($"{targetResolution} | {pos}");
+                throw new ArgumentException("Parameter must be between 0 and 1 (inclusive, exclusive)", nameof(pos));
+            }
 
             Vector3 rayVector = tlCorner + right * pos.X * vpWidth - up * pos.Y * vpHeight;
 
             return new Ray(position, rayVector);
         }
 
-        public static Vector2 ConvertScreenDims(int width, int height)
+        private Vector2i ConvertScreenDims(Vector2i dims)
         {
-            return new Vector2(width, height);
+            return new Vector2i(dims.X, dims.Y);
         }
 
         private Vector3 CrossAndNormalize(Vector3 vectorA, Vector3 vectorB)
