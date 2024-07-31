@@ -6,17 +6,21 @@ namespace raytracer
 {
     class RayTracer
     {
+        public Camera cam;
+
         Surface surface;
         Game window;
-        public Camera cam;
+        Scene scene;
 
         public RayTracer(Surface surface, Game window)
         {
             this.surface = surface;
             this.window = window;
 
+            this.scene = new Scene();
+
             cam = new Camera(
-                new Vector3(0f, 3f, 0f),
+                new Vector3(0f, 1f, 0f),
                 new Vector3(1f, 0f, 0f),
                 new Vector2i(surface.width, surface.height)
             );
@@ -24,7 +28,7 @@ namespace raytracer
 
         public void Render()
         {      
-            //cam.MoveBy(new Vector3(0.1f, 0f, 0f));
+            cam.MoveBy(new Vector3(-0.1f, 0f, 0f));
 
             for (int x = 0; x < surface.width; x++)
             {
@@ -34,15 +38,12 @@ namespace raytracer
 
                     Ray ray = cam.GetCameraRay(x, y);
 
-                    if (ray.direction.Y < 0)
+                    Intersection intersection = scene.FindClosestIntersection(ray);
+                    if (intersection != null)
                     {
-                        float distanceToFloor = ray.position.Y / -ray.direction.Y;
-                        Vector3 intersectionPoint = ray.position + distanceToFloor * ray.direction;
-
-                        color.Y += (MathF.Sin(intersectionPoint.X) + 1f) / 2f;
-                        color.Z += (MathF.Sin(intersectionPoint.Z) + 1f) / 2f;
+                        Sphere sphere = intersection.sphere;
+                        color = sphere.color;
                     }
-                    else color.X = 1;
 
                     surface.SetPixel(x, y, color);
                 }

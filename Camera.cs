@@ -7,7 +7,7 @@ namespace raytracer
     class Camera {
         static Vector3 UP_AXIS = Vector3.UnitY;
 
-        const float FOV_DEGREES = 90f;
+        const float FOV_DEGREES = 70f;
         const float FOV_RADIANS = (float)(FOV_DEGREES * Math.PI / 180f);
 
         Vector2i targetResolution;
@@ -53,7 +53,7 @@ namespace raytracer
         public void RecalculateScreenDimensions(Vector2i targetRes)
         {
             targetResolution = ConvertScreenDims(targetRes);
-            aspectRatio = (float)(targetResolution.X / targetResolution.Y);
+            aspectRatio = targetResolution.X / (float)targetResolution.Y;
 
             vpHalfHeight = (float)Math.Tan(FOV_RADIANS / 2);
             vpHeight = vpHalfHeight * 2;
