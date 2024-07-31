@@ -11,6 +11,7 @@ namespace raytracer
         Surface surface;
         Game window;
         Scene scene;
+        Light light;
 
         public RayTracer(Surface surface, Game window)
         {
@@ -18,6 +19,11 @@ namespace raytracer
             this.window = window;
 
             this.scene = new Scene();
+            this.light = new Light(
+                new Vector3(-1f, 1f, 0f),
+                new Vector3(1f, 1f, 1f),
+                1.4f
+            );
 
             cam = new Camera(
                 new Vector3(0f, 1f, 0f),
@@ -44,7 +50,8 @@ namespace raytracer
                         IIntersectable obj = intersection.obj;
                         Vector3 intersectionPoint = ray.position + ray.direction * intersection.t;
                         Vector3 normal = obj.Normal(intersectionPoint);
-                        color = normal;
+                        float lambert = Math.Clamp(Vector3.Dot(light.direction, normal), 0f, 1f);
+                        color = obj.color * lambert * light.color;
                     }
 
                     surface.SetPixel(x, y, color);
