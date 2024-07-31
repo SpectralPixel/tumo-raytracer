@@ -6,12 +6,9 @@ namespace raytracer
 
     class RayTracer
     {
-        Surface oldSurface;
         Surface surface;
         Game window;
-        Camera cam;
-
-        float fov = 90f;
+        public Camera cam;
 
         public RayTracer(Surface surface, Game window)
         {
@@ -20,16 +17,13 @@ namespace raytracer
 
             cam = new Camera(
                 new Vector3(1f, 0f, 0f),
-                new Vector3(0f, 0f, 0f),
-                Camera.ConvertScreenDims(surface.width, surface.height),
-                fov
+                new Vector3(1f, 0f, 0f),
+                Camera.ConvertScreenDims(surface.width, surface.height)
             );
         }
 
         public void Render()
-        {          
-            if (surface != oldSurface) cam.RecalculateScreenDimensions(Camera.ConvertScreenDims(surface.width, surface.height), fov);
-
+        {       
             for (int x = 0; x < surface.width; x++)
             {
                 for (int y = 0; y < surface.height; y++)
@@ -38,18 +32,19 @@ namespace raytracer
 
                     Ray ray = cam.GetCameraRay(x, y);
 
-                    if (ray.direction.Y < 0) color.X = 1;
+                    if (ray.direction.Y > 0) color.X = 1;
 
-                    surface.SetPixel(x, y, color.X, color.Y, color.Z);
+                    surface.SetPixel(x, y, color);
                 }
             }
-
-            oldSurface = surface;
         }
     }
 
     class Camera {
         static Vector3 UP_AXIS = Vector3.UnitY;
+
+        const float FOV_DEGREES = 90f;
+        const float FOV_RADIANS = (float)(FOV_DEGREES * Math.PI / 180f);
 
         Vector2 targetResolution;
         float aspectRatio;
@@ -75,39 +70,40 @@ namespace raytracer
         Vector3 up;
         Vector3 right;
 
-        public Camera(Vector3 position, Vector3 rotation, Vector2 targetResolution, float fov)
+        public Camera(Vector3 position, Vector3 rotation, Vector2 targetResolution)
         {
             this.position = position;
             this.forward = rotation;
 
-            RecalculateScreenDimensions(targetResolution, fov);
+            RecalculateScreenDimensions(targetResolution);
         }
 
-        public void RecalculateScreenDimensions(Vector2 targetResolution, float fov)
+        public void SetCameraTransform(Vector3 position, Vector3 rotation)
+        {
+            this.position = position;
+            this.forward = rotation;
+
+            Console.WriteLine($"Position: {position} | Rotation: {rotation}");
+
+            CalculateVectors();
+        }
+
+        public void RecalculateScreenDimensions(Vector2 targetResolution)
         {
             this.targetResolution = targetResolution;
             this.aspectRatio = (float)(targetResolution.X / targetResolution.Y);
 
-            this.fovDegrees = fov;
-            fovRadians = (float)(fov * Math.PI / 180);
-
-            vpHalfHeight = (float)Math.Tan(fovRadians / 2);
+            vpHalfHeight = (float)Math.Tan(FOV_RADIANS / 2);
             vpHeight = vpHalfHeight * 2;
             vpWidth = vpHeight * aspectRatio;
             vpHalfWidth = vpWidth / 2;
             
-            right = CrossAndNormalize(UP_AXIS, forward);
-            up = CrossAndNormalize(forward, right);
-
-            tlCorner = position + forward +  up * vpHalfHeight * -right * vpHalfHeight;
-            trCorner = position + forward +  up * vpHalfHeight *  right * vpHalfHeight;
-            blCorner = position + forward + -up * vpHalfHeight * -right * vpHalfHeight;
-            brCorner = position + forward + -up * vpHalfHeight *  right * vpHalfHeight;
+            CalculateVectors();
 
             Console.WriteLine($"targetResolution: {this.targetResolution}");
             Console.WriteLine($"aspectRatio: {this.aspectRatio}");
-            Console.WriteLine($"fovDegrees: {this.fovDegrees}");
-            Console.WriteLine($"fovRadians: {fovRadians}");
+            Console.WriteLine($"fovDegrees: {FOV_DEGREES}");
+            Console.WriteLine($"fovRadians: {FOV_RADIANS}");
             Console.WriteLine($"vpHalfHeight: {vpHalfHeight}");
             Console.WriteLine($"vpHalfWidth: {vpHalfWidth}");
             Console.WriteLine($"vpHeight: {vpHeight}");
@@ -121,11 +117,24 @@ namespace raytracer
             Console.WriteLine($"--------");
         }
 
+        public void CalculateVectors()
+        {
+            right = CrossAndNormalize(UP_AXIS, forward);
+            up = CrossAndNormalize(forward, right);
+
+            Console.WriteLine($"right: {right} | up: {up} | tlCorner {tlCorner}");
+
+            tlCorner = position + forward +  up * vpHalfHeight + -right * vpHalfWidth;
+            trCorner = position + forward +  up * vpHalfHeight +  right * vpHalfWidth;
+            blCorner = position + forward + -up * vpHalfHeight + -right * vpHalfWidth;
+            brCorner = position + forward + -up * vpHalfHeight +  right * vpHalfWidth;
+        }
+
         public Ray GetCameraRay(int x, int y)
         {
             return GetCameraRay(new Vector2(
-                x / targetResolution.X,
-                y / targetResolution.Y
+                (x + 0.5f) / targetResolution.X,
+                (y + 0.5f) / targetResolution.Y
             ));
         }
 
@@ -150,14 +159,43 @@ namespace raytracer
 
         private Vector3 CrossAndNormalize(Vector3 vectorA, Vector3 vectorB)
         {
-            // Vectors being either equal or set to zero will result in NaN!
+            // Several conditions cause the crossing of vectors to result in NaN!
             // Therefore we slightly change the vectors if they would break the simulation.
             float nudge = 0.1f;
             Vector3 nudgeVector = new Vector3(nudge, nudge, nudge);
+
+            // Either vector cannot be equal to zero
             if (vectorA == Vector3.Zero) vectorA += nudgeVector;
             if (vectorB == Vector3.Zero) vectorB += nudgeVector;
-            if (vectorA == vectorB)      vectorB += nudgeVector;
-            return Vector3.Cross(vectorA, vectorB).Normalized();
+
+            vectorA = vectorA.Normalized();
+            vectorB = vectorB.Normalized();
+
+            // The vectors cannot point in the same direction
+            float dot = Vector3.Dot(vectorA, vectorB);
+            if (dot >= 0.95f) vectorB += nudgeVector;
+
+            Vector3 crossed = Vector3.Cross(vectorA, vectorB).Normalized();
+
+            if (float.IsNaN(crossed.X)) throw new InvalidOperationException($"Crossed vector resulted in NaN! | VectorA: {vectorA} | VectorB: {vectorB}");
+
+            return crossed;
+        }
+
+        public void MoveBy(Vector3 translation)
+        {
+            SetCameraTransform(
+                position + translation,
+                forward
+            );
+        }
+
+        public void TurnBy(Vector3 rotation)
+        {
+            SetCameraTransform(
+                position,
+                forward + rotation
+            );
         }
     }
 
@@ -165,11 +203,10 @@ namespace raytracer
         public Vector3 position;
         public Vector3 direction;
 
-        public Ray(Vector3 pos, Vector3 dir)
+        public Ray(Vector3 pos, Vector3 targetPoint)
         {
             this.position = pos;
-            //this.direction = dir - pos; // WARNING WARNING!!!!!!! ALREADY SUBTRACTING HERE!!!!!!!
-            this.direction = dir;
+            this.direction = Vector3.Normalize(targetPoint - pos); // WARNING WARNING!!!!!!! ALREADY SUBTRACTING HERE!!!!!!!
         }
     }
 }
