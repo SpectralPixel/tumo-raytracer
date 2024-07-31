@@ -4,15 +4,21 @@ using OpenTK.Mathematics;
 
 namespace raytracer
 {
-    class Intersection
+    interface IIntersectable
+    {
+        Vector3 color { get; set; }
+        float Intersects(Ray ray);
+    }
+
+    class Intersection 
     {
         public float t; // remember the formula?
-        public Sphere sphere;
+        public IIntersectable obj;
         
-        public Intersection(float t, Sphere sphere)
+        public Intersection(float t, IIntersectable obj)
         {
             this.t = t;
-            this.sphere = sphere;
+            this.obj = obj;
         }
     }
 }

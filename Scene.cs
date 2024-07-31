@@ -6,9 +6,10 @@ namespace raytracer
 {
     class Scene
     {
-        List<Sphere> sceneObjects = new List<Sphere>();
+        List<IIntersectable> sceneObjects = new List<IIntersectable>();
         public Scene()
         {
+            sceneObjects.Add(new Plane(0f, new Vector3(0.2f, 0.2f, 0.2f)));
             sceneObjects.Add(new Sphere(new Vector3(5, 1, 0), new Vector3(0, 1, 0), 0.3f));
             sceneObjects.Add(new Sphere(new Vector3(3, 1, 2), new Vector3(0, 1, 1), 0.3f));
             sceneObjects.Add(new Sphere(new Vector3(4, 1, -2), new Vector3(1, 1, 0), 0.2f));
@@ -18,19 +19,19 @@ namespace raytracer
         public Intersection FindClosestIntersection(Ray ray)
         {
             Intersection closestIntersection = null;
-            foreach (Sphere sphere in sceneObjects)
+            foreach (IIntersectable obj in sceneObjects)
             {
-                float t = sphere.Intersects(ray);
+                float t = obj.Intersects(ray);
                 if (t < 0) continue;
 
                 if (closestIntersection == null)
                 {
-                    closestIntersection = new Intersection(t, sphere);
+                    closestIntersection = new Intersection(t, obj);
                 }
                 else if (t < closestIntersection.t)
                 {
                     closestIntersection.t = t;
-                    closestIntersection.sphere = sphere;
+                    closestIntersection.obj = obj;
                 }
             }
             return closestIntersection;

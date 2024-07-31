@@ -4,11 +4,12 @@ using OpenTK.Mathematics;
 
 namespace raytracer
 {
-    class Sphere
+    class Sphere : IIntersectable
     {
         public Vector3 center;
-        public Vector3 color;
         public float radius;
+
+        public Vector3 color { get; set; }
 
         public Sphere(Vector3 center, Vector3 color, float radius)
         {
@@ -47,6 +48,11 @@ namespace raytracer
             return sq(b) - 4 * a * c;
         }
 
+        // When doing it by hand, there are faster ways to solve quadratics
+        // than to use the formula. This is especially important during a test,
+        // since you have a limited amount of time to solve each question. If
+        // all else fails though, feel free to pull out the bazooka and blow
+        // the problem to bits. Works every time.
         private (float, float) Bazooka(float a, float b, float c)
         {
             return Bazooka(a, b, c, CalculateDiscriminant(a, b, c));

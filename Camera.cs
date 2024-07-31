@@ -13,9 +13,6 @@ namespace raytracer
         Vector2i targetResolution;
         float aspectRatio;
 
-        float fovDegrees;
-        float fovRadians;
-
         Vector3 position;
         Vector3 forward;
 

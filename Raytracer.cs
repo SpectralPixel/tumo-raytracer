@@ -41,8 +41,8 @@ namespace raytracer
                     Intersection intersection = scene.FindClosestIntersection(ray);
                     if (intersection != null)
                     {
-                        Sphere sphere = intersection.sphere;
-                        color = sphere.color;
+                        IIntersectable obj = intersection.obj;
+                        color = obj.color;
                     }
 
                     surface.SetPixel(x, y, color);
