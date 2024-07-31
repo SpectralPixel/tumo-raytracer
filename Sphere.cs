@@ -6,16 +6,21 @@ namespace raytracer
 {
     class Sphere : IIntersectable
     {
-        public Vector3 center;
-        public float radius;
-
+        public Vector3 center { get; set; }
         public Vector3 color { get; set; }
+
+        public float radius;
 
         public Sphere(Vector3 center, Vector3 color, float radius)
         {
             this.center = center;
             this.color = color;
             this.radius = radius;
+        }
+
+        public Vector3 Normal(Vector3 pointOnSurface)
+        {
+            return (pointOnSurface - center).Normalized();
         }
 
         public float Intersects(Ray ray)

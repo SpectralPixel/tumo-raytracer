@@ -42,7 +42,9 @@ namespace raytracer
                     if (intersection != null)
                     {
                         IIntersectable obj = intersection.obj;
-                        color = obj.color;
+                        Vector3 intersectionPoint = ray.position + ray.direction * intersection.t;
+                        Vector3 normal = obj.Normal(intersectionPoint);
+                        color = normal;
                     }
 
                     surface.SetPixel(x, y, color);

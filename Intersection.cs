@@ -7,6 +7,8 @@ namespace raytracer
     interface IIntersectable
     {
         Vector3 color { get; set; }
+
+        Vector3 Normal(Vector3 pointOnSurface);
         float Intersects(Ray ray);
     }
 
