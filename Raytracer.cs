@@ -6,7 +6,7 @@ namespace raytracer
 {
     class RayTracer
     {
-        const int RAYS_PER_PIXEL = 16;
+        const int RAYS_PER_PIXEL = 1;
 
         public Camera cam;
 
@@ -15,6 +15,9 @@ namespace raytracer
 
         Scene scene;
         SceneLights lights;
+
+        int frames;
+        Vector3[,] accumulationBuffer;
 
         public RayTracer(Surface surface, Game window)
         {
@@ -25,17 +28,24 @@ namespace raytracer
             this.lights = new SceneLights();
 
             cam = new Camera(
+                this,
                 new Vector3(0f, 1f, 0f),
                 new Vector2(0f, 0f),
                 new Vector2i(surface.width, surface.height)
             );
+
+            ResetAccumulationBuffer();
+        }
+
+        public void ResetAccumulationBuffer()
+        {
+            frames = 1;
+            accumulationBuffer = new Vector3[surface.width, surface.height];
         }
 
         public void Render()
-        {      
-            //cam.TurnBy(new Vector2(0.0f, 0.03f));
-
-            Vector3[,] accumulationBuffer = new Vector3[surface.width, surface.height];
+        {
+            // cam.MoveBy(new Vector3(0.01f, 0f, 0f));
 
             scene.CullHidden(cam);
 
@@ -85,10 +95,12 @@ namespace raytracer
                         accumulationBuffer[x, y] += color;
                     }
 
-                    Vector3 finalColor = accumulationBuffer[x, y] / RAYS_PER_PIXEL;
+                    Vector3 finalColor = accumulationBuffer[x, y] / (frames * RAYS_PER_PIXEL);
                     surface.SetPixel(x, y, finalColor);
                 }
             }
+
+            frames++;
         }
     }
 }

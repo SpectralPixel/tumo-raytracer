@@ -5,6 +5,8 @@ using OpenTK.Mathematics;
 namespace raytracer
 {
     class Camera {
+        RayTracer parent;
+
         static Vector3 UP_AXIS = Vector3.UnitY;
 
         const float FOV_DEGREES = 70f;
@@ -37,8 +39,9 @@ namespace raytracer
 
         Random rng = new System.Random();
 
-        public Camera(Vector3 pos, Vector2 rotation, Vector2i targetResolution)
+        public Camera(RayTracer parent, Vector3 pos, Vector2 rotation, Vector2i targetResolution)
         {
+            this.parent = parent;
             SetCameraNewTransform(pos, rotation);
             RecalculateScreenDimensions(targetResolution);
         }
@@ -96,6 +99,8 @@ namespace raytracer
             trCorner = position + forward +  up * vpHalfHeight +  right * vpHalfWidth;
             blCorner = position + forward + -up * vpHalfHeight + -right * vpHalfWidth;
             brCorner = position + forward + -up * vpHalfHeight +  right * vpHalfWidth;
+
+            parent.ResetAccumulationBuffer();
         }
 
         public Ray GetCameraRay(int x, int y)
