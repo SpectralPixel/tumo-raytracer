@@ -35,6 +35,8 @@ namespace raytracer
         Vector3 up;
         Vector3 right;
 
+        Random rng = new System.Random();
+
         public Camera(Vector3 pos, Vector2 rotation, Vector2i targetResolution)
         {
             SetCameraNewTransform(pos, rotation);
@@ -98,9 +100,12 @@ namespace raytracer
 
         public Ray GetCameraRay(int x, int y)
         {
+            float nudgeX = Math.Clamp((float)rng.NextDouble(), 0f, 0.99f);
+            float nudgeY = Math.Clamp((float)rng.NextDouble(), 0f, 0.99f);
+
             return GetCameraRay(new Vector2(
-                (x + 0.5f) / targetResolution.X,
-                (y + 0.5f) / targetResolution.Y
+                (x + nudgeX) / targetResolution.X,
+                (y + nudgeY) / targetResolution.Y
             ));
         }
 
