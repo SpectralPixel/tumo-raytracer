@@ -7,6 +7,7 @@ namespace raytracer
     class Scene
     {
         List<IIntersectable> sceneObjects = new List<IIntersectable>();
+        List<IIntersectable> inViewObjects = new List<IIntersectable>();
         public Scene()
         {
             sceneObjects.Add(new Plane(0f, new Vector3(0.2f, 0.2f, 0.2f)));
@@ -16,10 +17,29 @@ namespace raytracer
             sceneObjects.Add(new Sphere(new Vector3(4, 0.2f, 1), new Vector3(1, 0.5f, 0), 0.5f));
         }
 
+        public void CullHidden(Camera cam)
+        {
+            inViewObjects.Clear();
+            Console.WriteLine("Cleared!");
+
+            Vector3 camPos = cam.position;
+            Vector3 camViewDir = cam.forward;
+            float fov = Camera.FOV_RADIANS;
+            foreach (IIntersectable obj in sceneObjects)
+            {
+                bool cull = obj.Cull(camPos, camViewDir, fov);
+                if (!cull)
+                {
+                    inViewObjects.Add(obj);
+                    Console.WriteLine($"{obj} not culled!");
+                }
+            }
+        }
+
         public Intersection FindClosestIntersection(Ray ray)
         {
             Intersection closestIntersection = null;
-            foreach (IIntersectable obj in sceneObjects)
+            foreach (IIntersectable obj in inViewObjects)
             {
                 float t = obj.Intersects(ray);
                 if (t < 0) continue;

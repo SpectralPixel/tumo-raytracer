@@ -11,7 +11,7 @@ namespace raytracer
         Surface surface;
         Game window;
         Scene scene;
-        Light light;
+        DirectionalLight light;
 
         public RayTracer(Surface surface, Game window)
         {
@@ -19,7 +19,7 @@ namespace raytracer
             this.window = window;
 
             this.scene = new Scene();
-            this.light = new Light(
+            this.light = new DirectionalLight(
                 new Vector3(-1f, 1f, 0f),
                 new Vector3(1f, 1f, 1f),
                 1.4f
@@ -27,14 +27,16 @@ namespace raytracer
 
             cam = new Camera(
                 new Vector3(0f, 1f, 0f),
-                new Vector3(1f, 0f, 0f),
+                new Vector2(0f, 0f),
                 new Vector2i(surface.width, surface.height)
             );
         }
 
         public void Render()
         {      
-            cam.MoveBy(new Vector3(-0.1f, 0f, 0f));
+            cam.TurnBy(new Vector2(0.0f, 0.03f));
+
+            scene.CullHidden(cam);
 
             for (int x = 0; x < surface.width; x++)
             {

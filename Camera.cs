@@ -8,13 +8,17 @@ namespace raytracer
         static Vector3 UP_AXIS = Vector3.UnitY;
 
         const float FOV_DEGREES = 70f;
-        const float FOV_RADIANS = (float)(FOV_DEGREES * Math.PI / 180f);
+        public const float FOV_RADIANS = (float)(FOV_DEGREES * Math.PI / 180f);
+
+        public Vector3 position;
+        public Vector3 forward;
+        
+        // X = yaw, left/right
+        // Y = pitch, up/down
+        Vector2 rotation;
 
         Vector2i targetResolution;
         float aspectRatio;
-
-        Vector3 position;
-        Vector3 forward;
 
         // VP = view plane
         float vpHalfWidth;
@@ -31,20 +35,35 @@ namespace raytracer
         Vector3 up;
         Vector3 right;
 
-        public Camera(Vector3 pos, Vector3 rotation, Vector2i targetResolution)
+        public Camera(Vector3 pos, Vector2 rotation, Vector2i targetResolution)
         {
-            position = pos;
-            forward = rotation;
-
+            SetCameraNewTransform(pos, rotation);
             RecalculateScreenDimensions(targetResolution);
         }
 
-        public void SetCameraTransform(Vector3 pos, Vector3 rotation)
+        void ValidateCameraTransform(Vector3 pos, Vector2 rotation)
+        {
+            SetCameraNewTransform(pos, rotation);
+            CalculateVectors();
+        }
+
+        void SetCameraNewTransform(Vector3 pos, Vector2 rotation)
         {
             position = pos;
-            forward = rotation;
+            forward = CalculateForwardVector(rotation);
+        }
 
-            CalculateVectors();
+        Vector3 CalculateForwardVector(Vector2 rotation)
+        {
+            this.rotation = rotation;
+
+            float xzLen = (float)Math.Cos(rotation.Y);
+
+            return new Vector3(
+                (float)Math.Cos(rotation.X) * xzLen,
+                (float)Math.Sin(rotation.Y),
+                (float)Math.Sin(-rotation.X) * xzLen
+            ).Normalized();
         }
 
         public void RecalculateScreenDimensions(Vector2i targetRes)
@@ -60,9 +79,15 @@ namespace raytracer
             CalculateVectors();
         }
 
-        public void CalculateVectors()
+        void CalculateVectors()
         {
-            right = CrossAndNormalize(UP_AXIS, forward);
+            // if the camera is upside-down, multiply the universal up vector by -1 to allow for a flipped view
+            Vector3 upAxis = UP_AXIS;
+            upAxis.Y = (float)Math.Sign(Math.Cos(rotation.Y));
+
+            Console.WriteLine($"Up Axis: {upAxis}");
+
+            right = CrossAndNormalize(upAxis, forward);
             up = CrossAndNormalize(forward, right);
 
             tlCorner = position + forward +  up * vpHalfHeight + -right * vpHalfWidth;
@@ -125,17 +150,30 @@ namespace raytracer
 
         public void MoveBy(Vector3 translation)
         {
-            SetCameraTransform(
+            ValidateCameraTransform(
                 position + translation,
-                forward
+                rotation
             );
         }
 
-        public void TurnBy(Vector3 rotation)
+        public void TurnBy(Vector2 rotAmt)
         {
-            SetCameraTransform(
+            rotation += rotAmt;
+
+            float tau = (float)Math.Tau;
+
+            // Wrap the direction to be between 0 and 360
+            while (rotation.X < 0f) rotation.X += tau;
+            while (rotation.Y < 0f) rotation.Y += tau;
+
+            rotation.X %= tau;
+            rotation.Y %= tau;
+
+            Console.WriteLine($"View Direction: {rotation}");
+
+            ValidateCameraTransform(
                 position,
-                forward + rotation
+                rotation
             );
         }
     }

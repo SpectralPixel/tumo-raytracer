@@ -23,6 +23,13 @@ namespace raytracer
             return (pointOnSurface - center).Normalized();
         }
 
+        public bool Cull(Vector3 cameraPosition, Vector3 cameraViewDir, float fovRadians)
+        {
+            Vector3 camToSphereDistance = (center - cameraPosition).Normalized();
+            float angle = (float)Math.Acos(Vector3.Dot(camToSphereDistance, cameraViewDir));
+            return angle > fovRadians;
+        }
+
         public float Intersects(Ray ray)
         {
             Vector3 d = ray.direction;
