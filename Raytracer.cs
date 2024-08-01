@@ -6,7 +6,7 @@ namespace raytracer
 {
     class RayTracer
     {
-        const int RAYS_PER_PIXEL = 8;
+        const int RAYS_PER_PIXEL = 16;
 
         public Camera cam;
 
@@ -43,7 +43,7 @@ namespace raytracer
             {
                 for (int y = 0; y < surface.height; y++)
                 {
-                    for (int i = 0; i < RAYS_PER_PIXEL; i++)
+                    for (int pixelRayIndex = 0; pixelRayIndex < RAYS_PER_PIXEL; pixelRayIndex++)
                     {
                         Vector3 color = Vector3.Zero;
 
@@ -59,14 +59,16 @@ namespace raytracer
 
                             foreach (PointLight light in lights.sceneLights)
                             {
-                                Ray bounceRay = new Ray(intersectionPoint, light.position);
+                                Vector3 lightPosition = light.GetPointInside();
+
+                                Ray bounceRay = new Ray(intersectionPoint, lightPosition);
                                 bounceRay.position += (bounceRay.direction * 0.05f);
                                 Intersection bounceIntersection = scene.FindClosestIntersection(bounceRay);
 
                                 if (bounceIntersection == null)
                                 {
-                                    Vector3 lightColor = light.GetColor(Vector3.Distance(intersectionPoint, light.position));
-                                    Vector3 directionToLight = (light.position - intersectionPoint).Normalized();
+                                    Vector3 lightColor = light.GetColor(Vector3.Distance(intersectionPoint, lightPosition));
+                                    Vector3 directionToLight = (lightPosition - intersectionPoint).Normalized();
 
                                     float lambert = Math.Clamp(Vector3.Dot(directionToLight, normal), 0f, 1f);
                                     color += obj.color * lambert * lightColor;

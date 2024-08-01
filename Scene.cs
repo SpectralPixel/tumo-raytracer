@@ -10,7 +10,7 @@ namespace raytracer
         List<IIntersectable> inViewObjects = new List<IIntersectable>();
         public Scene()
         {
-            sceneObjects.Add(new Plane(0f, new Vector3(0.2f, 0.2f, 0.2f)));
+            sceneObjects.Add(new Plane(0f, new Vector3(0.8f, 0.8f, 0.8f)));
             sceneObjects.Add(new Sphere(new Vector3(5, 1, 0), new Vector3(0, 1, 0), 0.3f));
             sceneObjects.Add(new Sphere(new Vector3(3, 1, 2), new Vector3(0, 1, 1), 0.3f));
             sceneObjects.Add(new Sphere(new Vector3(4, 1, -2), new Vector3(1, 1, 0), 0.2f));
