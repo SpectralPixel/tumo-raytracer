@@ -10,8 +10,9 @@ namespace raytracer
 
         Surface surface;
         Game window;
+
         Scene scene;
-        DirectionalLight light;
+        SceneLights lights;
 
         public RayTracer(Surface surface, Game window)
         {
@@ -19,11 +20,7 @@ namespace raytracer
             this.window = window;
 
             this.scene = new Scene();
-            this.light = new DirectionalLight(
-                new Vector3(-1f, 1f, 0f),
-                new Vector3(1f, 1f, 1f),
-                1.4f
-            );
+            this.lights = new SceneLights();
 
             cam = new Camera(
                 new Vector3(0f, 1f, 0f),
@@ -34,7 +31,7 @@ namespace raytracer
 
         public void Render()
         {      
-            cam.TurnBy(new Vector2(0.0f, 0.03f));
+            //cam.TurnBy(new Vector2(0.0f, 0.03f));
 
             scene.CullHidden(cam);
 
@@ -51,9 +48,24 @@ namespace raytracer
                     {
                         IIntersectable obj = intersection.obj;
                         Vector3 intersectionPoint = ray.position + ray.direction * intersection.t;
+
                         Vector3 normal = obj.Normal(intersectionPoint);
-                        float lambert = Math.Clamp(Vector3.Dot(light.direction, normal), 0f, 1f);
-                        color = obj.color * lambert * light.color;
+
+                        foreach (PointLight light in lights.sceneLights)
+                        {
+                            Ray bounceRay = new Ray(intersectionPoint, light.position);
+                            bounceRay.position += (bounceRay.direction * 0.05f);
+                            Intersection bounceIntersection = scene.FindClosestIntersection(bounceRay);
+
+                            if (bounceIntersection == null)
+                            {
+                                Vector3 lightColor = light.GetColor(Vector3.Distance(intersectionPoint, light.position));
+                                Vector3 directionToLight = (light.position - intersectionPoint).Normalized();
+
+                                float lambert = Math.Clamp(Vector3.Dot(directionToLight, normal), 0f, 1f);
+                                color += obj.color * lambert * lightColor;
+                            }
+                        }
                     }
 
                     surface.SetPixel(x, y, color);

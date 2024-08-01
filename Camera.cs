@@ -57,8 +57,8 @@ namespace raytracer
         {
             this.rotation = rotation;
 
+            // No idea what this does, some of the only stuff I copied off of StackOverflow
             float xzLen = (float)Math.Cos(rotation.Y);
-
             return new Vector3(
                 (float)Math.Cos(rotation.X) * xzLen,
                 (float)Math.Sin(rotation.Y),
