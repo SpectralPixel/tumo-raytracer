@@ -50,33 +50,39 @@ namespace raytracer
                         Ray ray = cam.GetCameraRay(x, y);
 
                         Intersection intersection = scene.FindClosestIntersection(ray);
-                        if (intersection != null)
+                        if (intersection == null)
                         {
-                            IIntersectable obj = intersection.obj;
-                            Vector3 intersectionPoint = ray.position + ray.direction * intersection.t;
+                            accumulationBuffer[x, y] += Vector3.Zero;
+                            continue;
+                        }
 
-                            Vector3 normal = obj.Normal(intersectionPoint);
+                        IIntersectable obj = intersection.obj;
+                        Vector3 intersectionPoint = ray.position + ray.direction * intersection.t;
 
-                            foreach (PointLight light in lights.sceneLights)
+                        Vector3 normal = obj.Normal(intersectionPoint);
+
+                        foreach (PointLight light in lights.sceneLights)
+                        {
+                            Vector3 lightPosition = light.GetPointInside();
+
+                            Ray bounceRay = new Ray(intersectionPoint, lightPosition);
+                            bounceRay.position += (bounceRay.direction * 0.05f);
+                            Intersection bounceIntersection = scene.FindClosestIntersection(bounceRay);
+
+                            if (bounceIntersection != null)
                             {
-                                Vector3 lightPosition = light.GetPointInside();
-
-                                Ray bounceRay = new Ray(intersectionPoint, lightPosition);
-                                bounceRay.position += (bounceRay.direction * 0.05f);
-                                Intersection bounceIntersection = scene.FindClosestIntersection(bounceRay);
-
-                                if (bounceIntersection == null)
-                                {
-                                    Vector3 lightColor = light.GetColor(Vector3.Distance(intersectionPoint, lightPosition));
-                                    Vector3 directionToLight = (lightPosition - intersectionPoint).Normalized();
-
-                                    float lambert = Math.Clamp(Vector3.Dot(directionToLight, normal), 0f, 1f);
-                                    color += obj.color * lambert * lightColor;
-                                }
+                                accumulationBuffer[x, y] += Vector3.Zero;
+                                continue;
                             }
 
-                            accumulationBuffer[x, y] += color;
+                            Vector3 lightColor = light.GetColor(Vector3.Distance(intersectionPoint, lightPosition));
+                            Vector3 directionToLight = (lightPosition - intersectionPoint).Normalized();
+
+                            float lambert = Math.Clamp(Vector3.Dot(directionToLight, normal), 0f, 1f);
+                            color += obj.color * lambert * lightColor;
                         }
+
+                        accumulationBuffer[x, y] += color;
                     }
 
                     Vector3 finalColor = accumulationBuffer[x, y] / RAYS_PER_PIXEL;
