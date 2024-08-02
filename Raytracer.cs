@@ -6,8 +6,6 @@ namespace raytracer
 {
     class RayTracer
     {
-        const int RAYS_PER_PIXEL = 1;
-
         public Camera cam;
 
         Surface surface;
@@ -53,12 +51,9 @@ namespace raytracer
             {
                 for (int y = 0; y < surface.height; y++)
                 {
-                    for (int pixelRayIndex = 0; pixelRayIndex < RAYS_PER_PIXEL; pixelRayIndex++)
-                    {
-                        accumulationBuffer[x, y] += GetColorAtPixel(x, y);
-                    }
+                    accumulationBuffer[x, y] += GetColorAtPixel(x, y);
 
-                    Vector3 finalColor = accumulationBuffer[x, y] / (frames * RAYS_PER_PIXEL);
+                    Vector3 finalColor = accumulationBuffer[x, y] / frames;
                     surface.SetPixel(x, y, finalColor);
                 }
             }
