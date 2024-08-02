@@ -13,6 +13,7 @@ namespace raytracer
 
         Scene scene;
         SceneLights lights;
+        Texture backgroundTexture;
 
         int frames;
         Vector3[,] accumulationBuffer;
@@ -24,6 +25,8 @@ namespace raytracer
 
             this.scene = new Scene();
             this.lights = new SceneLights();
+
+            this.backgroundTexture = new Texture("sky.jpg");
 
             cam = new Camera(
                 this,
@@ -85,7 +88,7 @@ namespace raytracer
             else ray = cam.GetRandomCameraRay(x, y);
 
             Intersection intersection = scene.FindClosestIntersection(ray);
-            if (intersection == null) return Vector3.Zero;
+            if (intersection == null) return GetBackgroundColor(ray.position + ray.direction * 1000f);
 
             IIntersectable obj = intersection.obj;
             Vector3 intersectionPoint = ray.position + ray.direction * intersection.t;
@@ -118,6 +121,13 @@ namespace raytracer
             }
 
             return color;
+        }
+
+        Vector3 GetBackgroundColor(Vector3 hitPosition)
+        {
+            Vector2 direction = Sphere.GetDirectionFromPositions(hitPosition, cam.position);
+
+            return backgroundTexture.GetPixelColorAt(direction);
         }
     }
 }

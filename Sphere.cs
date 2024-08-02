@@ -44,7 +44,14 @@ namespace raytracer
         {
             if (color.X >= 0f) return color;
 
-            Vector3 localPos = (worldPosition - center).Normalized();
+            Vector2 direction = Sphere.GetDirectionFromPositions(worldPosition, center);
+
+            return texture.GetPixelColorAt(direction);
+        }
+
+        public static Vector2 GetDirectionFromPositions(Vector3 worldPosition, Vector3 centerPosition)
+        {
+            Vector3 localPos = (worldPosition - centerPosition).Normalized();
             double xzLength = Math.Sqrt(localPos.X * localPos.X + localPos.Z * localPos.Z);
 
             // yaw, pitch
@@ -53,7 +60,7 @@ namespace raytracer
                 (float)Math.Acos(localPos.Y)
             );
 
-            return texture.GetPixelColorAt(direction);
+            return direction;
         }
 
         public float Intersects(Ray ray)
