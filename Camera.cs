@@ -103,18 +103,18 @@ namespace raytracer
             parent.ResetAccumulationBuffer();
         }
 
-        public Ray GetCameraRay(int x, int y)
+        public Ray GetRandomCameraRay(int x, int y)
         {
             float nudgeX = Math.Clamp((float)rng.NextDouble(), 0f, 0.99f);
             float nudgeY = Math.Clamp((float)rng.NextDouble(), 0f, 0.99f);
 
-            return GetCameraRay(new Vector2(
+            return GetRandomCameraRay(new Vector2(
                 (x + nudgeX) / targetResolution.X,
                 (y + nudgeY) / targetResolution.Y
             ));
         }
 
-        public Ray GetCameraRay(Vector2 pos)
+        public Ray GetRandomCameraRay(Vector2 pos)
         {
             if (pos.X < 0 || pos.X >= 1 || pos.Y < 0 || pos.Y >= 1)
             {
