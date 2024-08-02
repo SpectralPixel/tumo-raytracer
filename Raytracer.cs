@@ -43,29 +43,46 @@ namespace raytracer
 
         public void Render()
         {
-            // cam.MoveBy(new Vector3(0.01f, 0f, 0f));
+            cam.MoveBy(new Vector3(0.01f, 0f, 0f));
 
             scene.CullHidden(cam);
 
-            for (int x = 0; x < surface.width; x++)
-            {
-                for (int y = 0; y < surface.height; y++)
-                {
-                    accumulationBuffer[x, y] += GetColorAtPixel(x, y);
-
-                    Vector3 finalColor = accumulationBuffer[x, y] / frames;
-                    surface.SetPixel(x, y, finalColor);
-                }
-            }
+            // if it's the first frame, generate a low quality image first
+            int resolutionDropoff = frames == 1 ? 4 : 1;
+            Raytrace(resolutionDropoff);
 
             frames++;
         }
 
-        Vector3 GetColorAtPixel(int x, int y)
+        void Raytrace(int resolutionDropoff = 1)
+        {
+            for (int x = 0; x < surface.width; x += resolutionDropoff)
+            {
+                for (int y = 0; y < surface.height; y += resolutionDropoff)
+                {
+                    Vector3 color = GetColorAtPixel(x, y, resolutionDropoff != 1);
+                    
+                    for (int nudgeX = 0; nudgeX < resolutionDropoff; nudgeX++)
+                    {
+                        for (int nudgeY = 0; nudgeY < resolutionDropoff; nudgeY++)
+                        {
+                            int newX = x + nudgeX;
+                            int newY = y + nudgeY;
+                            accumulationBuffer[newX, newY] += color;
+                            surface.SetPixel(newX, newY, accumulationBuffer[x, y] / frames);
+                        }
+                    }
+                }
+            }
+        }
+
+        Vector3 GetColorAtPixel(int x, int y, bool pixelPerfect)
         {
             Vector3 color = Vector3.Zero;
 
-            Ray ray = cam.GetRandomCameraRay(x, y);
+            Ray ray;
+            if (pixelPerfect) ray = cam.GetCameraRay(x, y);
+            else ray = cam.GetRandomCameraRay(x, y);
 
             Intersection intersection = scene.FindClosestIntersection(ray);
             if (intersection == null) return Vector3.Zero;
@@ -77,7 +94,9 @@ namespace raytracer
 
             foreach (PointLight light in lights.sceneLights)
             {
-                Vector3 lightPosition = light.GetPointInside();
+                Vector3 lightPosition;
+                if (pixelPerfect) lightPosition = light.position;
+                else lightPosition = light.GetPointInside();
 
                 Ray bounceRay = new Ray(intersectionPoint, lightPosition);
                 bounceRay.position += (bounceRay.direction * 0.05f);

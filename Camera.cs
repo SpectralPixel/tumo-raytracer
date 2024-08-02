@@ -127,6 +127,27 @@ namespace raytracer
             return new Ray(position, rayVector);
         }
 
+        public Ray GetCameraRay(int x, int y)
+        {
+            return GetCameraRay(new Vector2(
+                (x + 0.5f) / targetResolution.X,
+                (y + 0.5f) / targetResolution.Y
+            ));
+        }
+
+        public Ray GetCameraRay(Vector2 pos)
+        {
+            if (pos.X < 0 || pos.X >= 1 || pos.Y < 0 || pos.Y >= 1)
+            {
+                Console.WriteLine($"{targetResolution} | {pos}");
+                throw new ArgumentException("Parameter must be between 0 and 1 (inclusive, exclusive)", nameof(pos));
+            }
+
+            Vector3 rayVector = tlCorner + right * pos.X * vpWidth - up * pos.Y * vpHeight;
+
+            return new Ray(position, rayVector);
+        }
+
         private Vector2i ConvertScreenDims(Vector2i dims)
         {
             return new Vector2i(dims.X, dims.Y);
