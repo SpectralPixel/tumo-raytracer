@@ -43,7 +43,7 @@ namespace raytracer
 
         public void Render()
         {
-            cam.MoveBy(new Vector3(0.01f, 0f, 0f));
+            //cam.MoveBy(new Vector3(0.01f, 0f, 0f));
 
             scene.CullHidden(cam);
 
@@ -108,11 +108,13 @@ namespace raytracer
                     continue;
                 }
 
+                Vector3 objColor = obj.GetColorAtPixel(intersectionPoint);
+
                 Vector3 lightColor = light.GetColor(Vector3.Distance(intersectionPoint, lightPosition));
                 Vector3 directionToLight = (lightPosition - intersectionPoint).Normalized();
 
                 float lambert = Math.Clamp(Vector3.Dot(directionToLight, normal), 0f, 1f);
-                color += obj.color * lambert * lightColor;
+                color += objColor * lambert * lightColor;
             }
 
             return color;

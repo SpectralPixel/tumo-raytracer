@@ -6,15 +6,25 @@ namespace raytracer
 {
     class Sphere : IIntersectable
     {
-        public Vector3 center { get; set; }
-        public Vector3 color { get; set; }
+        public Vector3 center { get; }
 
         public float radius;
+        
+        Vector3 color;
+        Texture texture;
 
         public Sphere(Vector3 center, Vector3 color, float radius)
         {
             this.center = center;
             this.color = color;
+            this.radius = radius;
+        }
+
+        public Sphere(Vector3 center, String texImgPath, float radius)
+        {
+            this.center = center;
+            this.color = new Vector3(-1f, 0f, 0f);
+            this.texture = new Texture(texImgPath);
             this.radius = radius;
         }
 
@@ -28,6 +38,22 @@ namespace raytracer
             Vector3 camToSphereDistance = (center - cameraPosition).Normalized();
             float angle = (float)Math.Acos(Vector3.Dot(camToSphereDistance, cameraViewDir));
             return angle > fovRadians;
+        }
+
+        public Vector3 GetColorAtPixel(Vector3 worldPosition)
+        {
+            if (color.X >= 0f) return color;
+
+            Vector3 localPos = (worldPosition - center).Normalized();
+            double xzLength = Math.Sqrt(localPos.X * localPos.X + localPos.Z * localPos.Z);
+
+            // yaw, pitch
+            Vector2 direction = new Vector2(
+                (float)Math.Atan2(localPos.X, localPos.Z),
+                (float)Math.Acos(localPos.Y)
+            );
+
+            return texture.GetPixelColorAt(direction);
         }
 
         public float Intersects(Ray ray)

@@ -63,11 +63,11 @@ namespace raytracer
             this.rotation = rotation;
 
             // No idea what this does, some of the only stuff I copied off of StackOverflow
-            float xzLen = (float)Math.Cos(rotation.Y);
+            float xzLength = (float)Math.Cos(rotation.Y);
             return new Vector3(
-                (float)Math.Cos(rotation.X) * xzLen,
+                (float)Math.Cos(rotation.X) * xzLength,
                 (float)Math.Sin(rotation.Y),
-                (float)Math.Sin(-rotation.X) * xzLen
+                (float)Math.Sin(-rotation.X) * xzLength
             ).Normalized();
         }
 
@@ -89,8 +89,6 @@ namespace raytracer
             // if the camera is upside-down, multiply the universal up vector by -1 to allow for a flipped view
             Vector3 upAxis = UP_AXIS;
             upAxis.Y = (float)Math.Sign(Math.Cos(rotation.Y));
-
-            Console.WriteLine($"Up Axis: {upAxis}");
 
             right = CrossAndNormalize(upAxis, forward);
             up = CrossAndNormalize(forward, right);
@@ -199,8 +197,6 @@ namespace raytracer
 
             rotation.X %= tau;
             rotation.Y %= tau;
-
-            Console.WriteLine($"View Direction: {rotation}");
 
             ValidateCameraTransform(
                 position,

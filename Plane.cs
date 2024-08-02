@@ -6,9 +6,17 @@ namespace raytracer
 {
     class Plane : IIntersectable
     {
-        public Vector3 color { get; set; }
+        Vector3 color;
+        Texture texture;
 
         float height;
+
+        public Plane(float height, String texImgPath)
+        {
+            this.height = height;
+            this.color = new Vector3(-1f, 0f, 0f);
+            this.texture = new Texture(texImgPath);
+        }
 
         public Plane(float height, Vector3 color)
         {
@@ -39,6 +47,12 @@ namespace raytracer
         {
             float t = (ray.position.Y - height) / -ray.direction.Y;
             return t;
+        }
+
+        public Vector3 GetColorAtPixel(Vector3 worldPosition)
+        {
+            if (color.X >= 0f) return color;
+            return texture.GetPixelColorAt(new Vector2(worldPosition.X, worldPosition.Z));
         }
     }
 }
