@@ -57,7 +57,7 @@ namespace raytracer
             // yaw, pitch
             Vector2 direction = new Vector2(
                 (float)Math.Atan2(localPos.X, localPos.Z),
-                (float)Math.Acos(localPos.Y)
+                (float)Math.Acos(localPos.Y / 2f)
             );
 
             return direction;
