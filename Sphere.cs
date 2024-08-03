@@ -7,25 +7,28 @@ namespace raytracer
     class Sphere : IIntersectable
     {
         public Vector3 center { get; }
+        public bool reflective { get; }
 
         public float radius;
         
         Vector3 color;
         Texture texture;
 
-        public Sphere(Vector3 center, Vector3 color, float radius)
+        public Sphere(Vector3 center, Vector3 color, float radius, bool reflective)
         {
             this.center = center;
             this.color = color;
             this.radius = radius;
+            this.reflective = reflective;
         }
 
-        public Sphere(Vector3 center, String texImgPath, float radius)
+        public Sphere(Vector3 center, String texImgPath, float radius, bool reflective)
         {
             this.center = center;
             this.color = new Vector3(-1f, 0f, 0f);
             this.texture = new Texture(texImgPath);
             this.radius = radius;
+            this.reflective = reflective;
         }
 
         public Vector3 Normal(Vector3 pointOnSurface)

@@ -10,11 +10,11 @@ namespace raytracer
         List<IIntersectable> inViewObjects = new List<IIntersectable>();
         public Scene()
         {
-            sceneObjects.Add(new Plane(0f, "earth.jpg"));
-            sceneObjects.Add(new Sphere(new Vector3(5, 1, 0), new Vector3(0, 1, 0), 0.3f));
-            sceneObjects.Add(new Sphere(new Vector3(3, 1, 2), new Vector3(0, 1, 1), 0.3f));
-            sceneObjects.Add(new Sphere(new Vector3(4, 1, -2), new Vector3(1, 1, 0), 0.2f));
-            sceneObjects.Add(new Sphere(new Vector3(4, 0.2f, 1), "fabric.jpg", 0.5f));
+            sceneObjects.Add(new Plane(0f, new Vector3(1, 1, 1), true));
+            sceneObjects.Add(new Sphere(new Vector3(5, 1, 0), "earth.jpg", 0.3f, true));
+            sceneObjects.Add(new Sphere(new Vector3(3, 1, 2), new Vector3(0, 1, 1), 0.3f, false));
+            sceneObjects.Add(new Sphere(new Vector3(4, 1, -2), new Vector3(1, 1, 0), 0.2f, false));
+            sceneObjects.Add(new Sphere(new Vector3(4, 0.2f, 1), "fabric.jpg", 0.5f, false));
         }
 
         public void CullHidden(Camera cam)

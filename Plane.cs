@@ -6,22 +6,26 @@ namespace raytracer
 {
     class Plane : IIntersectable
     {
+        public bool reflective { get; }
+
         Vector3 color;
         Texture texture;
 
         float height;
 
-        public Plane(float height, String texImgPath)
+        public Plane(float height, String texImgPath, bool reflective)
         {
             this.height = height;
             this.color = new Vector3(-1f, 0f, 0f);
             this.texture = new Texture(texImgPath);
+            this.reflective = reflective;
         }
 
-        public Plane(float height, Vector3 color)
+        public Plane(float height, Vector3 color, bool reflective)
         {
             this.height = height;
             this.color = color;
+            this.reflective = reflective;
         }
 
         public Vector3 Normal(Vector3 pointOnSurface)

@@ -6,6 +6,7 @@ namespace raytracer
 {
     interface IIntersectable
     {
+        public bool reflective { get; }
         Vector3 Normal(Vector3 pointOnSurface);
         bool Cull(Vector3 cameraPosition, Vector3 cameraViewDir, float fovRadians);
         float Intersects(Ray ray);

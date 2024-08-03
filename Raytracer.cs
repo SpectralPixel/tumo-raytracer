@@ -6,6 +6,8 @@ namespace raytracer
 {
     class RayTracer
     {
+        const int MAX_BOUNCES = 2;
+
         public Camera cam;
 
         Surface surface;
@@ -87,13 +89,30 @@ namespace raytracer
             if (pixelPerfect) ray = cam.GetCameraRay(x, y);
             else ray = cam.GetRandomCameraRay(x, y);
 
-            Intersection intersection = scene.FindClosestIntersection(ray);
-            if (intersection == null) return GetBackgroundColor(ray.position + ray.direction * 1000f);
+            int bounces = 0;
+            IIntersectable obj;
+            Vector3 intersectionPoint;
+            Vector3 normal;
 
-            IIntersectable obj = intersection.obj;
-            Vector3 intersectionPoint = ray.position + ray.direction * intersection.t;
+            do
+            {
+                Intersection intersection = scene.FindClosestIntersection(ray);
+                if (intersection == null) return GetBackgroundColor(ray.position + ray.direction * 1000f);
 
-            Vector3 normal = obj.Normal(intersectionPoint);
+                obj = intersection.obj;
+                intersectionPoint = ray.position + ray.direction * intersection.t;
+
+                normal = obj.Normal(intersectionPoint);
+
+                if (!obj.reflective) break;
+
+                Vector3 reflectionDirection = ray.direction + normal * Vector3.Dot(-ray.direction, normal) * 2f;
+
+                ray.direction = reflectionDirection;
+                ray.position = intersectionPoint + (reflectionDirection * 0.05f);
+
+                bounces++;
+            } while (bounces < MAX_BOUNCES);
 
             foreach (PointLight light in lights.sceneLights)
             {
@@ -101,11 +120,11 @@ namespace raytracer
                 if (pixelPerfect) lightPosition = light.position;
                 else lightPosition = light.GetPointInside();
 
-                Ray bounceRay = new Ray(intersectionPoint, lightPosition);
-                bounceRay.position += (bounceRay.direction * 0.05f);
-                Intersection bounceIntersection = scene.FindClosestIntersection(bounceRay);
+                Ray lightCheck = new Ray(intersectionPoint, lightPosition);
+                lightCheck.position += (lightCheck.direction * 0.05f); 
+                Intersection lightCheckIntersection = scene.FindClosestIntersection(lightCheck);
 
-                if (bounceIntersection != null)
+                if (lightCheckIntersection != null)
                 {
                     accumulationBuffer[x, y] += Vector3.Zero;
                     continue;
